@@ -37,14 +37,17 @@
 <!--         {% block styles %}{% endblock %} -->
 
     </head>
-    <body>
+    <body onload="init()">
         <!--[if lt IE 7]>
             <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
         <![endif]-->
+        
+        
         <div class="container">
         	<div id="header">
 	        	<h1 class="c-white">Yoonjo Choi</h1>
 	        	<p id="yoonjoIs">Yoonjo is a designer, artist and currently a graduate student of Interactive Telecommunications Program at NYU where she learned how to code her imaginations. Her main interest lays on the web and interactive visuals. She also enjoy's installations, drawing and working with fabric, while constantly wondering what it would be like if the world was a different color.</p>
+
 
         	</div>
         	<div id="content">
@@ -59,16 +62,13 @@
 
         </div> <!-- /container -->
 
-<!--
-        <script src="jarallax-0.2.3b.js" type='text/javascript'></script>
-        <script src="script.js" type='text/javascript'></script>
--->
         
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="{{ url_for('static', filename='js/jquery-1.8.1.min.js') }}"><\/script>')</script>
-        <script src="{{ url_for('static', filename='js/vendor/bootstrap.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/jarallax-0.2.3b.js') }}"></script>
         <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-        
+        <script src="{{ url_for('static', filename='js/jquery-1.8.1.min.js') }}"></script>
         {% block scripts %}{% endblock %}
 
     </body>
