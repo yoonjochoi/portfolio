@@ -653,16 +653,9 @@ h6 small {
 }
 
 h1 {
-  font-family: 'Raleway', sans-serif; 
-  font-weight: 100;
+  
   font-size: 36px;
   line-height: 40px;
-  text-align: center;
-/*   position:fixed; */
-/*
-  top:400px;
-  padding-top: 300px;
-*/
 }
 
 h2 {
