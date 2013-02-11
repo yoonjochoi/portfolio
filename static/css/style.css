@@ -17,7 +17,7 @@ body {
 	-o-background-size: cover;
 	background-size: cover;
 	overflow:scroll;
-	height: 3000px;
+	height: 13000px;
 }
 
 
@@ -113,6 +113,7 @@ footer { text-align: center;}
 	height:100%;
 	top:0%;
 	left: 0px;
+	background-color: #fff;
 }
 
 #topBanner{
@@ -124,12 +125,124 @@ footer { text-align: center;}
 	background-color:#fff;
 }
 
-#thumbnailsContainer{
-	position: relative;
-	width: 100%;
+.t-title{
+	margin:10px 0;
+	font-family: 'Raleway', sans-serif;
+}
+
+.t{
+	height: 235px; 
+	width: 235px;
+	max-width: 100%;
+	vertical-align: middle;
+	border: 0;
+	-ms-interpolation-mode: bicubic;
+}
+
+#project1-1{
+	display: block;
+	/* background: url(/static/img/thumbnail/t-bw-town-in-town.jpg); */
+	background-image: url(/static/img/thumbnail-hover/t-Town-in-Town.jpg);
+}
+
+/*
+#project1-1:hover{
+	background-image: url(/static/img/thumbnail-hover/t-Town-in-Town.jpg);
+}
+*/
+
+#project1-2{
+	display: block;
+/* 	background: url(/static/img/thumbnail/t-bw-thelistserve.jpg); */
+background-image: url(/static/img/thumbnail-hover/t-thelistserve.jpg);
+}
+
+/*
+#project1-2:hover{
+	background-image: url(/static/img/thumbnail-hover/t-thelistserve.jpg);
+}
+*/
+
+#project1-3{
+	display: block;
+/* 	background: url(/static/img/thumbnail/t-bw-nostalgia.jpg); */
+background-image: url(/static/img/thumbnail-hover/t-nostalgia.jpg);
+}
+
+/*
+#project1-3:hover{
+	background-image: url(/static/img/thumbnail-hover/t-nostalgia.jpg);
+}
+*/
+
+#project1-4{
+	display: block;
+/* 	background: url(/static/img/thumbnail/t-bw-tune-art.jpg); */
+background-image: url(/static/img/thumbnail-hover/t-tune-art.jpg);
+}
+
+/*
+#project1-4:hover{
+	background-image: url(/static/img/thumbnail-hover/t-tune-art.jpg);
+}
+*/
+
+
+
+.gray{
+	color: #B2B2B2;
+}
+
+#row1{
+	position: fixed;
+	width: 940px;
 	height:100%;
-	top:110px;
-	left: 0px;
+	top:100%;
+	background-color:#fff;	
+	z-index: -2;
+}
+
+#row2{
+	position: fixed;
+	width: 940px;
+	height:100%;
+	top:100%;
+	background-color:#fff;	
+	z-index: -2;
+}
+
+#row3{
+	position: fixed;
+	width: 940px;
+	height:100%;
+	top:100%;
+	background-color:#fff;	
+	z-index: -2;
+}
+
+#row4{
+	position: fixed;
+	width: 940px;
+	height:100%;
+	top:100%;
+	background-color:#fff;	
+	z-index: -2;
+}
+
+#row5{
+	position: fixed;
+	width: 940px;
+	height:100%;
+	top:100%;
+	background-color:#fff;	
+	z-index: -2;
+}
+
+#row6{
+	position: fixed;
+	width: 940px;
+	height:100%;
+	top:100%;
 	background-color:#fff;	
 	z-index: -2;
 }
@@ -146,6 +259,10 @@ footer { text-align: center;}
 	left: 60px;
 }
 
+.thumbnail-size{
+	width:235px;
+}
+
 /* BOTTOM */
 #bottom{
 	position: fixed;
@@ -157,20 +274,31 @@ footer { text-align: center;}
 	z-index: -1;
 }
 
+#wrapBio{
+	position: fixed;
+	width: 100%;
+	height:100%;
+	top:110px;
+	background-color:#E0E1E2;
+	z-index: -1;
+}
+
 
 .red{
 	background-color: red;
 }
 
+
+
 .testSize{
-	height:100px;
+	height:200px;
 }
 
 .center{
-	height: 500px;
+/* 	height: 500px; */
 	width: 940px;
-	margin: 0 auto;
-	padding-top: 200px;
+	/* margin: 0 auto; */
+	margin-left:auto; margin-right:auto;
 /*
 	position: fixed;
 	left: 50%;
