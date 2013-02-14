@@ -64,9 +64,7 @@ init = function(){
 						   [{progress:'0%', top: '100%'},
 						   {progress:'96%', top: '100%'},
 						   {progress:'100%', top: '30%'}]);
-						   
-						   
-
+						 
 
 }
 
