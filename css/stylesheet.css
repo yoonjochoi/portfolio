@@ -125,6 +125,7 @@ p {
 
 #cover{
 	height: 500px;
+	overflow: hidden;
 	/* background-color: #121212; */
 	background-image: linear-gradient(#143066, #2c223f);
 }
@@ -250,6 +251,9 @@ SECTION & PROJECTS THUMBNAIL
 
 .hero-phone-frame{
 	flex: none;
+	width: 1878px;
+	height: 580px;
+	max-width: none;
 }
 
 .hero-highlight{
@@ -332,7 +336,7 @@ SECTION & PROJECTS THUMBNAIL
 	text-align: center;
 }
 
-.intro-heading{
+h1.intro-heading{
 	position: relative;
 	display: inline-flex;
 	align-items: flex-start;
@@ -402,7 +406,7 @@ SECTION & PROJECTS THUMBNAIL
 	padding: 120px 0;
 }
 
-.section-heading{
+h1.section-heading{
 	margin: 0;
 	font-family: 'Montserrat', sans-serif;
 	font-size: 36px;
