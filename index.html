@@ -15,7 +15,7 @@
     <!-- Custom CSS & FONT -->
     <link href="css/stylesheet.css" rel="stylesheet">
     <style>
-	    @import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Raleway:wght@400;600;700&display=swap');
+	    @import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Montserrat:wght@400;500;600;700&family=Raleway:ital,wght@0,400;0,600;1,600&display=swap');
 	  </style>
 
 
@@ -37,79 +37,114 @@
   
   <body>
   	
-  	<div id="cover">  	
-		  	<img src="img/Hi.png" class="mx-auto" style="display:block; width: 280px; padding: 170px 0;">
+  	<div id="cover" class="hero-landing">
+  		<div class="hero-phone-wrap" aria-hidden="true">
+  			<img src="img/hero-phone-frame.svg" alt="" width="1878" height="580" class="hero-phone-frame">
+  		</div>
+  		<div class="hero-highlight" aria-hidden="true">
+  			<div class="hero-highlight-pill-fill"></div>
+  			<div class="hero-highlight-pill"></div>
+  			<div class="hero-highlight-screen"></div>
+  		</div>
+  		<div class="hero-copy">
+  			<p class="hero-name">Yoonjo Choi</p>
+  			<p class="hero-role">Product Designer</p>
+  		</div>
 		</div> <!-- End of ID cover -->
 
 
 
   	<div class="container">
-			<div id="intro" class="p-top-104 center-txt">
-		  	<h1>I'm Yoonjo Choi &mdash; a Product Designer</h1>
-		  	<p class="mx-auto p-24 col-md-9">I'm currently located in San Francisco and love to be artsy and crafty. I am well versed in user-centered design, having research and user needs being the core of any feature or product I produce. My experience ranges from B2B enterprise ad platforms to high-end real estate sales gallery tools to consumer-facing sites.</br>Fun fact, I built this site from scratch.</p>
-		  	<p>My motto is to <i><span style="font-weight:600; color:#f25267;">stay curious</span></i>.</p>
+			<div id="intro" class="intro-landing">
+		  	<h1 class="intro-heading">Hi<img src="img/hi-hand.svg" alt="" width="38" height="48" class="hi-hand"></h1>
+		  	<p class="intro-bio">I'm currently located in San Francisco and love to be artsy and crafty. I am well versed in user-centered design, having research and user needs being the core of any feature or product I produce. My experience ranges from B2B enterprise ad platforms to high-end real estate sales gallery tools to consumer-facing sites.<br>Fun fact, I built this site from scratch.</p>
+		  	<p class="intro-motto">My motto is to <span>stay curious</span>.</p>
 		  </div> <!-- End of ID intro -->
 		</div> <!-- End of container -->  		  
 		
 		
 		  
-		  <div id="projects-section" class="clearfix p-104">
+		  <div id="projects-section" class="clearfix projects-landing">
 		  	<div class="container">
-			  	<h1>Projects</h1>
-			  	<div class="line-break" style="width:137px;"></div>
+			  	<h1 class="section-heading">Projects</h1>
+			  	<div class="section-underline"></div>
 		  	
 		  		<div class="row">
-			  	<div id="thumbnail-new-project" class="col-md-4 project-grid-item">
-			  		<a href="project/new-project.html">
-				  		<img src="img/thumbnail-new-project.png" alt="New Project" class="m-16 projects-thumbnail projects-thumbnail-placeholder">
-				  		<h4>Category <span>Subcategory</span></h4>
-				  		<h3>New Project</h3>
-				  		<h6>2026</h6>
-			  		</a>
+			  	<div class="col-md-4 project-grid-item">
+			  		<div class="project-card">
+				  		<div class="project-thumb project-thumb-soon">
+				  			<span class="project-thumb-bar"></span>
+				  			<span class="project-thumb-label">Coming soon</span>
+				  		</div>
+				  		<p class="project-kicker">QuickBooks Live</p>
+				  		<h3>AI assisted onboarding: Guided setup agent</h3>
+				  		<p class="project-year">2026</p>
+			  		</div>
+			  	</div>
+			  	
+			  	<div class="col-md-4 project-grid-item">
+			  		<div class="project-card">
+				  		<div class="project-thumb">
+				  			<img src="img/thumbnail-qbo-expert-assisted.png?v=6" srcset="img/thumbnail-qbo-expert-assisted.png?v=6 2x" width="354" height="230" alt="QuickBooks Live experts">
+				  		</div>
+				  		<p class="project-kicker">QuickBooks <span>Live</span></p>
+				  		<h3>Expert assisted onboarding</h3>
+				  		<p class="project-year">2026</p>
+			  		</div>
 			  	</div>
 			  	
 			  	<div id="thumbnail-cn" class="col-md-4 project-grid-item">
-			  		<a href="project/connecting-tools.html">
-				  		<img src="img/thumbnail-connecting-tools.png" alt="..." class="m-16 projects-thumbnail">
-				  		<h4>Ad Platforms <span>Demand Side Platform</span></h4>
+			  		<a href="project/connecting-tools.html" class="project-card">
+				  		<div class="project-thumb">
+				  			<img src="img/thumbnail-connecting-tools.png?v=6" srcset="img/thumbnail-connecting-tools.png?v=6 2x" width="354" height="230" alt="Connecting Tools">
+				  		</div>
+				  		<p class="project-kicker">Ad Platforms <span>Demand Side Platform</span></p>
 				  		<h3>Connecting Tools</h3>
-				  		<h6>2020</h6>
+				  		<p class="project-year">2020</p>
 			  		</a>
 			  	</div>
 			  	
 			  	<div id="thumbnail-omni" class="col-md-4 project-grid-item">
-			  		<a href="project/omniscope.html">
-				  		<img src="img/thumbnail-omni.JPG" alt="..." class="m-16 projects-thumbnail">
-				  		<h4>Ad Platforms <span>Demand Side Platform</span></h4>
+			  		<a href="project/omniscope.html" class="project-card">
+				  		<div class="project-thumb">
+				  			<img src="img/thumbnail-omni.JPG?v=6" srcset="img/thumbnail-omni.JPG?v=6 2x" width="354" height="230" alt="Omniscope">
+				  		</div>
+				  		<p class="project-kicker">Ad Platforms <span>Demand Side Platform</span></p>
 				  		<h3>Omniscope</h3>
-				  		<h6>2018</h6>
+				  		<p class="project-year">2018</p>
 			  		</a>
 			  	</div>		
 			  	
 			  	<div id="thumbnail-ui-systems" class="col-md-4 project-grid-item">
-			  		<a href="project/ui-systems.html">
-				  		<img src="img/thumbnail-systems.png" alt="..." class="m-16 projects-thumbnail">
-				  		<h4>Ad Platforms <span>Demand Side Platform</span></h4>
+			  		<a href="project/ui-systems.html" class="project-card">
+				  		<div class="project-thumb">
+				  			<img src="img/thumbnail-systems.png?v=6" srcset="img/thumbnail-systems.png?v=6 2x" width="354" height="230" alt="UI Systems">
+				  		</div>
+				  		<p class="project-kicker">Ad Platforms <span>Demand Side Platform</span></p>
 				  		<h3>UI Systems</h3>
-				  		<h6>2020</h6>
+				  		<p class="project-year">2020</p>
 			  		</a>
 			  	</div>
 			  	
 			  	<div id="thumbnail-pacing" class="col-md-4 project-grid-item">
-			  		<a  href="project/pacing.html">
-				  		<img src="img/thumbnail-pacing.png" alt="..." class="m-16 projects-thumbnail">
-				  		<h4>Ad Platforms <span>Demand Side Platform</span></h4>
+			  		<a href="project/pacing.html" class="project-card">
+				  		<div class="project-thumb">
+				  			<img src="img/thumbnail-pacing.png?v=6" srcset="img/thumbnail-pacing.png?v=6 2x" width="354" height="230" alt="Pacing">
+				  		</div>
+				  		<p class="project-kicker">Ad Platforms <span>Demand Side Platform</span></p>
 				  		<h3>Pacing</h3>
-				  		<h6>2020</h6>
+				  		<p class="project-year">2020</p>
 			  		</a>
 			  	</div>
 			  	
 			  	<div id="thumbnail-100E53" class="col-md-4 project-grid-item">
-			  		<a href="project/100E53.html">
-				  		<img src="img/thumbnail-100E53.jpg" alt="..." class="m-16 projects-thumbnail">
-				  		<h4>Sales Gallery Tool</span></h4>
+			  		<a href="project/100E53.html" class="project-card">
+				  		<div class="project-thumb">
+				  			<img src="img/thumbnail-100E53.jpg?v=6" srcset="img/thumbnail-100E53.jpg?v=6 2x" width="354" height="230" alt="100E53">
+				  		</div>
+				  		<p class="project-kicker">Sales Gallery Tool</p>
 				  		<h3>100E53</h3>
-				  		<h6>2016</h6>
+				  		<p class="project-year">2016</p>
 				  	</a>
 			  	</div>
 			  	</div>
@@ -121,40 +156,42 @@
 
 		  
 		  
-		  <div id="creative-corner-section" class="clearfix p-104">
+		  <div id="creative-corner-section" class="clearfix cc-landing">
 			  <div class="container">
-			  	<h1>Creative Corner</h1>
-			  	<div class="line-break" style="width:269px;"></div>
+			  	<h1 class="section-heading">Creative Corner</h1>
+			  	<div class="section-underline section-underline-wide"></div>
 			  	
 			  	<div class="row">
 			  	<div id="thumbnail-sf-doodles" class="col-md-4 project-grid-item">
-			  		<a href="cc/sf-doodles.html">
-				  		<img src="img/thumbnail-plants-1.png" alt="..." class="m-16 projects-thumbnail">
-				  		<h4>SF Doodles</br><span>Oil Pastel, Photography</br>2016&#8211;Current</span></h4>
+			  		<a href="cc/sf-doodles.html" class="project-card">
+				  		<div class="project-thumb project-thumb-cc">
+				  			<img src="img/thumbnail-plants-1.png?v=2" alt="SF Doodles">
+				  		</div>
+				  		<p class="project-kicker">SF Doodles</p>
+				  		<p class="project-meta">Oil Pastel, Photography<br>2016&#8211;Current</p>
 			  		</a>
 			  	</div>
 
 			  	<div id="thumbnail-nostalgia" class="col-md-4 project-grid-item">
-			  		<a href="cc/nostalgia.html">
-				  		<img src="img/thumbnail-nostalgia.png" alt="..." class="m-16 projects-thumbnail">
-				  		<h4>Nostalgia</br><span>Interactive Artwork</br>2011</span></h4>
+			  		<a href="cc/nostalgia.html" class="project-card">
+				  		<div class="project-thumb project-thumb-cc">
+				  			<img src="img/thumbnail-nostalgia.png?v=2" alt="Nostalgia">
+				  		</div>
+				  		<p class="project-kicker">Nostalgia</p>
+				  		<p class="project-meta">Interactive Artwork<br>2011</p>
 			  		</a>
 			  	</div>
 			  	
 			  	<div id="thumbnail-engraved" class="col-md-4 project-grid-item">
-			  		<a href="cc/engraved.html">
-				  		<img src="img/thumbnail-engraved.png" alt="..." class="m-16 projects-thumbnail">
-				  		<h4>Engraved</br><span>Ink</br>2011</span></h4>
+			  		<a href="cc/engraved.html" class="project-card">
+				  		<div class="project-thumb project-thumb-cc">
+				  			<img src="img/thumbnail-engraved.png?v=2" alt="Engraved">
+				  		</div>
+				  		<p class="project-kicker">Engraved</p>
+				  		<p class="project-meta">Ink<br>2011</p>
 				  		</a>
 			  	</div>
 			  	</div>
-			  	
-			  	<!-- <div class="col-md-3 float-left">
-			  		<a href="cc/tph.html">
-				  		<img src="img/thumbnail-tph.png" alt="..." class="m-16 projects-thumbnail" style="height:174.16pxpx;">
-				  		<h4>Ten Percent Human</br><span>Mixed Media, Interactive</br>2013</span></h4>
-			  		</a>
-			  	</div> -->
 			  	
 			  </div> <!-- End of container -->
 		  </div> <!-- End of ID creative-corner-section -->
@@ -180,5 +217,3 @@
     
   </body>
 </html>
-
-
