@@ -280,6 +280,12 @@ SECTION & PROJECTS THUMBNAIL
 	box-shadow: 0 0 50px 0 rgba(0, 0, 0, 0.35);
 }
 
+.hero-highlight-pill,
+.hero-highlight-screen{
+	overflow: visible;
+	mix-blend-mode: hard-light;
+}
+
 .hero-highlight-pill{
 	position: absolute;
 	left: 50%;
@@ -287,16 +293,15 @@ SECTION & PROJECTS THUMBNAIL
 	width: 188px;
 	height: 55px;
 	transform: translateX(-50%);
-	border: 1.2px solid rgba(240, 203, 176, 0.1);
-	border-radius: 60px;
+	opacity: 0.3;
 }
 
 .hero-highlight-screen{
 	position: absolute;
 	inset: 0;
-	border: 1.2px solid rgba(240, 203, 176, 0.1);
-	border-bottom: none;
-	border-radius: 60px 60px 0 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0.4;
 }
 
 .hero-copy{
