@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Guided setup agent — prototype</title>
+  <link rel="icon" href="../favicon.png" type="image/x-icon"/>
+  <style>
+    :root {
+      --bg: #1a1d21;
+      --chrome: #0f1114;
+      --hint: rgba(255,255,255,0.55);
+      --accent: #2ca01c;
+      /* Figma Smart Animate easing ≈ ease-out */
+      --ease-out: cubic-bezier(0, 0, 0.58, 1);
+      --dur-sm: 300ms;
+      --dur-md: 400ms;
+      --rail-left: 73.33%;
+      --rail-width: 26.67%;
+      /* Figma left nav ≈ 218 / 1424 */
+      --nav-width: 15.31%;
+      --nav-dur: 420ms;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .proto-shell {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .proto-bar {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 18px;
+      background: var(--chrome);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      z-index: 20;
+    }
+
+    .proto-bar a {
+      color: var(--hint);
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .proto-bar a:hover { color: #fff; }
+
+    .proto-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .proto-meta {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--hint);
+    }
+
+    .voice-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .voice-pill.on {
+      border-color: rgba(44,160,28,0.45);
+      background: rgba(44,160,28,0.15);
+      color: #9be08a;
+    }
+
+    .voice-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #666;
+    }
+    .voice-pill.on .voice-dot {
+      background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(44,160,28,0.25);
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.7; }
+    }
+
+    .proto-stage {
+      flex: 1 1 auto;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0c0e10;
+      overflow: hidden;
+    }
+
+    .viewport {
+      position: relative;
+      /* Width-driven + aspect-ratio only — never set height independently
+         or object-fit:fill will squash/stretch the frame. */
+      width: min(100%, 1424px, calc((100vh - 48px) * 1424 / 890));
+      height: auto;
+      aspect-ratio: 1424 / 890;
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+    }
+
+    /*
+      Transition model (matches Figma Smart Animate):
+      - Underlay stays fully visible — never fades to empty (no blink)
+      - Incoming layer animates on top, then underlay is hidden instantly
+    */
+    .screen {
+      position: absolute;
+      inset: 0;
+      visibility: hidden;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 1;
+      transform: none;
+      clip-path: none;
+      /* No default transitions — only enter classes animate */
+      transition: none;
+    }
+
+    .screen.is-underlay {
+      visibility: visible;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .screen.is-active {
+      visibility: visible;
+      pointer-events: auto;
+      z-index: 3;
+    }
+
+    .screen img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: top left;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    /* Right rail slides in from off-canvas (380/1424 ≈ 26.67%) */
+    .screen.enter-panel {
+      visibility: visible;
+      z-index: 3;
+      clip-path: inset(0 0 0 var(--rail-left));
+      transform: translateX(var(--rail-width));
+      transition: transform var(--dur-sm) var(--ease-out);
+    }
+    .screen.enter-panel.is-active {
+      transform: translateX(0);
+    }
+    .screen.enter-panel.is-settled {
+      clip-path: none;
+      transform: none;
+      transition: none;
+    }
+
+    /* Soft dissolve for chat / matched-layer updates */
+    .screen.enter-fade {
+      visibility: visible;
+      z-index: 3;
+      opacity: 0;
+      transition: opacity var(--dur-sm) var(--ease-out);
+    }
+    .screen.enter-fade.dur-md {
+      transition-duration: var(--dur-md);
+    }
+    .screen.enter-fade.is-active {
+      opacity: 1;
+    }
+
+    /*
+      Left main nav — slides out to the left (hide) / in from the left (show).
+      Opacity hits 0% once fully off-canvas.
+    */
+    .left-nav-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: var(--nav-width);
+      z-index: 6;
+      overflow: hidden;
+      pointer-events: none;
+      transform: translateX(0);
+      opacity: 1;
+      transition:
+        transform var(--nav-dur) var(--ease-out),
+        opacity var(--nav-dur) var(--ease-out);
+      will-change: transform, opacity;
+    }
+    .left-nav-layer img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top left;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .left-nav-layer.is-hidden {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    .left-nav-layer.is-idle {
+      visibility: hidden;
+    }
+
+    /*
+      CG Insight highlight — fixed 2px stroke, equal blue↔teal.
+      Finer alternating stops keep similar amounts of each color on
+      any aspect ratio; angle animates so weight stays constant.
+    */
+    @property --insight-angle {
+      syntax: "<angle>";
+      inherits: false;
+      initial-value: 0deg;
+    }
+
+    .insight-highlight {
+      position: absolute;
+      z-index: 4;
+      pointer-events: none;
+      border-radius: 8px;
+    }
+
+    .insight-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-sizing: border-box;
+      padding: 2px;
+      background: conic-gradient(
+        from var(--insight-angle),
+        #236cff 0deg,
+        #38e8f6 90deg,
+        #236cff 180deg,
+        #38e8f6 270deg,
+        #236cff 360deg
+      );
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      animation: insightOrbit 5.5s linear infinite;
+    }
+
+    @keyframes insightOrbit {
+      to { --insight-angle: 360deg; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .insight-ring {
+        animation: none;
+        background: conic-gradient(#236cff, #38e8f6, #236cff);
+      }
+    }
+
+    .hotspot {
+      position: absolute;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 6px;
+      z-index: 5;
+    }
+
+    .hotspot:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .hotspot::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 8px;
+      box-shadow: 0 0 0 0 rgba(44,160,28,0);
+      transition: box-shadow 180ms ease, background 180ms ease;
+    }
+    .proto-shell.show-hints .screen.is-active .hotspot::after {
+      background: rgba(44,160,28,0.08);
+      box-shadow: 0 0 0 2px rgba(44,160,28,0.45);
+    }
+
+    .hint-toggle {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: transparent;
+      color: var(--hint);
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .hint-toggle:hover,
+    .proto-shell.show-hints .hint-toggle {
+      color: #fff;
+      border-color: rgba(255,255,255,0.35);
+    }
+
+    .step-label {
+      font-variant-numeric: tabular-nums;
+    }
+
+    @media (max-width: 720px) {
+      .proto-title { display: none; }
+      .viewport {
+        width: 100%;
+        height: auto;
+        max-height: calc(100vh - 48px);
+        aspect-ratio: 1424 / 890;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .screen.enter-panel,
+      .screen.enter-fade,
+      .left-nav-layer {
+        transition-duration: 1ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="proto-shell" id="shell">
+    <div class="proto-bar">
+      <a href="../index.html">← Portfolio</a>
+      <span class="proto-title">AI assisted onboarding · Guided setup agent</span>
+      <div class="proto-meta">
+        <span class="step-label" id="stepLabel">1 / 10</span>
+        <span class="voice-pill" id="voicePill" title="Agent voice starts when the panel opens">
+          <span class="voice-dot"></span>
+          <span id="voiceLabel">Voice off</span>
+        </span>
+        <button type="button" class="hint-toggle" id="hintToggle">Show clicks</button>
+      </div>
+    </div>
+
+    <div class="proto-stage">
+      <div class="viewport" id="viewport" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const IMG = "../img/guided-setup-agent/proto/";
+      const CACHE = "?v=20260930b"; // bust cache after 08/09 ratio rebuild
+      const imgUrl = (file) => IMG + file + CACHE;
+
+      /**
+       * Mirrors Figma proto (Smart Animate, ease-out).
+       * transition:
+       *   panel — right rail slides in over stable hub (300ms)
+       *   smart — dissolve over underlay for chat/layer updates (300ms)
+       *   page  — longer dissolve for main-canvas changes (400ms)
+       */
+      const steps = [
+        {
+          id: "hub",
+          src: "01-hub.png",
+          label: "Hub · Get started",
+          transition: "smart",
+          duration: 300,
+          hotspots: [
+            { top: 62, left: 75.5, width: 22.5, height: 5.5, next: 1, label: "Get started" }
+          ]
+        },
+        {
+          id: "mic",
+          src: "02-mic.png",
+          label: "Enable mic · Agent opens",
+          /* Figma: Right rail smart-animates from x=100% → 73.33% (300ms ease-out) */
+          transition: "panel",
+          duration: 300,
+          enableVoice: true,
+          autoAdvanceMs: 400,
+          autoNext: 2,
+          voice: "I'm your AI onboarding assistant, and I'm here to walk you through how to use reports in QuickBooks. Before we get started, make sure to allow your browser to access your microphone so we can talk clearly.",
+          hotspots: [
+            { top: 12, left: 6, width: 28, height: 5, next: 2, label: "Allow while visiting this site" },
+            { top: 8, left: 4, width: 32, height: 18, next: 2, label: "Allow microphone", soft: true }
+          ]
+        },
+        {
+          id: "greeting",
+          src: "03-greeting.png",
+          label: "Agent greeting · Choose topic",
+          transition: "smart",
+          duration: 300,
+          voice: "Reports are a powerful tool that can give you a clear picture of your business's financial health. For questions outside of reports I can help you set up an appointment with an onboarding Expert who can help. You can talk to me just like you would an assistant. If you need to pause at any point, just let me know. Where would you like to begin? We can create a Balance Sheet, review your Profit and Loss report, customize reports, curate your favorite reports, or tackle something else.",
+          hotspots: [
+            { top: 54.5, left: 68, width: 12, height: 6, next: 3, label: "Balance Sheet" },
+            { top: 52, left: 66, width: 32, height: 18, next: 3, label: "Choose Balance Sheet", soft: true }
+          ]
+        },
+        {
+          id: "bs-chip",
+          src: "04-bs-chip.png",
+          label: "Balance Sheet selected",
+          transition: "smart",
+          duration: 300,
+          autoAdvanceMs: 500,
+          autoNext: 4,
+          hotspots: []
+        },
+        {
+          id: "click-reports",
+          src: "05-click-reports.png",
+          label: "Click Reports",
+          transition: "smart",
+          duration: 300,
+          voice: "Great! To get started, click on Reports in the left menu.",
+          highlights: [
+            { top: 49.44, left: 0, width: 14.96, height: 4.49, radius: 8 }
+          ],
+          hotspots: [
+            { top: 36, left: 0.5, width: 14, height: 5, next: 5, label: "Reports" },
+            { top: 48, left: 0, width: 16, height: 8, next: 5, label: "Reports tip", soft: true }
+          ]
+        },
+        {
+          id: "reports",
+          src: "06-reports.png",
+          label: "Reports page",
+          transition: "page",
+          duration: 300,
+          autoAdvanceMs: 400,
+          autoNext: 6,
+          hotspots: []
+        },
+        {
+          id: "click-bs",
+          src: "07-click-bs.png",
+          label: "Click Balance Sheet",
+          transition: "smart",
+          duration: 400,
+          voice: "Next, click on Balance Sheet.",
+          highlights: [
+            { top: 65.84, left: 18.75, width: 38.06, height: 4.49, radius: 8 }
+          ],
+          hotspots: [
+            { top: 66, left: 18, width: 40, height: 6, next: 7, label: "Balance Sheet" },
+            { top: 28, left: 15, width: 28, height: 10, next: 7, label: "Balance Sheet report", soft: true }
+          ]
+        },
+        {
+          id: "bs-explain",
+          src: "08-bs-explain.png",
+          label: "Balance Sheet explained",
+          transition: "page",
+          duration: 400,
+          hideNav: true,
+          autoAdvanceMs: 500,
+          autoNext: 8,
+          voice: "The Balance Sheet provides a snapshot of your company's financial position at a specific point in time. It includes three main components: assets, liabilities, and owner's equity.",
+          hotspots: []
+        },
+        {
+          id: "assets",
+          src: "09-assets.png",
+          label: "Assets explained",
+          transition: "smart",
+          duration: 400,
+          hideNav: true,
+          autoAdvanceMs: 500,
+          autoNext: 9,
+          voice: "Assets are anything of value that your business owns, such as cash, inventory, equipment, and accounts receivable, which can be used to generate revenue.",
+          hotspots: []
+        },
+        {
+          id: "favorites",
+          src: "10-favorites.png",
+          label: "Favorites · End",
+          transition: "page",
+          duration: 400,
+          hotspots: []
+        }
+      ];
+
+      const viewport = document.getElementById("viewport");
+      const stepLabel = document.getElementById("stepLabel");
+      const voicePill = document.getElementById("voicePill");
+      const voiceLabel = document.getElementById("voiceLabel");
+      const hintToggle = document.getElementById("hintToggle");
+      const shell = document.getElementById("shell");
+
+      let index = 0;
+      let voiceEnabled = false;
+      let transitioning = false;
+      let autoTimer = null;
+      const screenEls = [];
+
+      // Shared left-nav strip for collapse / expand motion
+      const navLayer = document.createElement("div");
+      navLayer.className = "left-nav-layer is-idle is-hidden";
+      navLayer.setAttribute("aria-hidden", "true");
+      const navImg = document.createElement("img");
+      navImg.src = imgUrl("left-nav-strip.png");
+      navImg.alt = "";
+      navLayer.appendChild(navImg);
+      viewport.appendChild(navLayer);
+
+      const NAV_DUR = 420;
+
+      steps.forEach((s) => {
+        const img = new Image();
+        img.src = imgUrl(s.src);
+      });
+      // Prefetch nav strip
+      (new Image()).src = imgUrl("left-nav-strip.png");
+
+      steps.forEach((step, i) => {
+        const el = document.createElement("div");
+        el.className = "screen" + (i === 0 ? " is-active" : "");
+        el.dataset.id = step.id;
+        el.setAttribute("aria-hidden", i === 0 ? "false" : "true");
+
+        const img = document.createElement("img");
+        img.src = imgUrl(step.src);
+        img.alt = step.label;
+        el.appendChild(img);
+
+        (step.highlights || []).forEach((hl) => {
+          const ring = document.createElement("div");
+          ring.className = "insight-highlight";
+          ring.style.top = hl.top + "%";
+          ring.style.left = hl.left + "%";
+          ring.style.width = hl.width + "%";
+          ring.style.height = hl.height + "%";
+          const radius = hl.radius != null ? hl.radius : 8;
+          ring.style.borderRadius = radius + "px";
+          ring.innerHTML = '<div class="insight-ring"></div>';
+          ring.setAttribute("aria-hidden", "true");
+          el.appendChild(ring);
+        });
+
+        step.hotspots.forEach((h) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "hotspot";
+          btn.style.top = h.top + "%";
+          btn.style.left = h.left + "%";
+          btn.style.width = h.width + "%";
+          btn.style.height = h.height + "%";
+          btn.setAttribute("aria-label", h.label || "Continue");
+          if (h.soft) btn.style.zIndex = "4";
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            goTo(h.next);
+          });
+          el.appendChild(btn);
+        });
+
+        viewport.appendChild(el);
+        screenEls.push(el);
+      });
+
+      function clearAuto() {
+        if (autoTimer) {
+          window.clearTimeout(autoTimer);
+          autoTimer = null;
+        }
+      }
+
+      function scheduleAuto(step) {
+        clearAuto();
+        if (step.autoNext == null) return;
+        const delay = step.autoAdvanceMs != null ? step.autoAdvanceMs : 0;
+        autoTimer = window.setTimeout(() => {
+          goTo(step.autoNext);
+        }, delay);
+      }
+
+      function updateChrome() {
+        stepLabel.textContent = (index + 1) + " / " + steps.length;
+        voicePill.classList.toggle("on", voiceEnabled);
+        voiceLabel.textContent = voiceEnabled ? "Voice on" : "Voice off";
+      }
+
+      function pickVoice() {
+        const voices = window.speechSynthesis.getVoices();
+        return voices.find(v => /en-US|en-GB/i.test(v.lang) && /Samantha|Karen|Moira|Google US English|Natural|Female/i.test(v.name))
+          || voices.find(v => /^en[-_]?US/i.test(v.lang))
+          || voices.find(v => /^en/i.test(v.lang))
+          || null;
+      }
+
+      /** Speak text fully (sentence chunks — Chrome cuts long utterances). */
+      function speakAsync(text) {
+        return new Promise((resolve) => {
+          if (!voiceEnabled || !text || !window.speechSynthesis) {
+            resolve();
+            return;
+          }
+          window.speechSynthesis.cancel();
+          const chunks = text.match(/[^.!?]+[.!?]+(?:\s|$)|[^.!?]+$/g) || [text];
+          const preferred = pickVoice();
+          let i = 0;
+
+          function speakNext() {
+            if (i >= chunks.length) {
+              resolve();
+              return;
+            }
+            const piece = chunks[i++].trim();
+            if (!piece) {
+              speakNext();
+              return;
+            }
+            const u = new SpeechSynthesisUtterance(piece);
+            u.rate = 1.02;
+            u.pitch = 1;
+            u.volume = 1;
+            if (preferred) u.voice = preferred;
+            u.onend = speakNext;
+            u.onerror = speakNext;
+            window.speechSynthesis.speak(u);
+          }
+
+          speakNext();
+        });
+      }
+
+      function speak(text) {
+        speakAsync(text);
+      }
+
+      if (window.speechSynthesis) {
+        window.speechSynthesis.getVoices();
+        window.speechSynthesis.onvoiceschanged = function () {
+          window.speechSynthesis.getVoices();
+        };
+      }
+
+      function resetScreenClasses(el) {
+        el.classList.remove(
+          "is-active",
+          "is-underlay",
+          "enter-panel",
+          "enter-fade",
+          "dur-md",
+          "is-settled"
+        );
+      }
+
+      function prepNavCollapse() {
+        // Start on-canvas, then slide out left → opacity 0
+        navLayer.classList.remove("is-idle", "is-hidden");
+        void navLayer.offsetWidth;
+        requestAnimationFrame(() => {
+          navLayer.classList.add("is-hidden");
+        });
+      }
+
+      function prepNavExpand() {
+        // Start off-canvas (opacity 0), then slide in from left
+        navLayer.classList.remove("is-idle");
+        navLayer.classList.add("is-hidden");
+        void navLayer.offsetWidth;
+        requestAnimationFrame(() => {
+          navLayer.classList.remove("is-hidden");
+        });
+      }
+
+      function finishNav(hide) {
+        if (hide) {
+          navLayer.classList.add("is-hidden", "is-idle");
+        } else {
+          navLayer.classList.add("is-idle");
+          navLayer.classList.remove("is-hidden");
+        }
+      }
+
+      function goTo(nextIndex) {
+        if (transitioning) return;
+        if (nextIndex < 0 || nextIndex >= steps.length || nextIndex === index) return;
+
+        clearAuto();
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+        const fromStep = steps[index];
+        const from = screenEls[index];
+        const to = screenEls[nextIndex];
+        const toStep = steps[nextIndex];
+        const kind = toStep.transition || "smart";
+        const duration = toStep.duration || (kind === "page" ? 400 : 300);
+
+        const collapsing = !fromStep.hideNav && !!toStep.hideNav;
+        // No nav expand on last screen — only collapse out when entering report screens
+        const expanding = false;
+        const animDur = Math.max(duration, collapsing ? NAV_DUR : 0);
+
+        if (toStep.enableVoice) {
+          voiceEnabled = true;
+          updateChrome();
+        }
+
+        transitioning = true;
+
+        // Keep outgoing fully visible underneath — never fade it out
+        resetScreenClasses(from);
+        from.classList.add("is-underlay");
+        from.setAttribute("aria-hidden", "true");
+        // While collapsing, clip underlay nav so only the sliding strip is seen
+        if (collapsing) {
+          from.style.clipPath = "inset(0 0 0 var(--nav-width))";
+        }
+
+        resetScreenClasses(to);
+        to.setAttribute("aria-hidden", "false");
+
+        if (kind === "panel") {
+          to.classList.add("enter-panel");
+        } else {
+          to.classList.add("enter-fade");
+          if (duration >= 400) to.classList.add("dur-md");
+        }
+
+        // Force start state before activating
+        void to.offsetWidth;
+
+        to.classList.add("is-active");
+
+        if (collapsing) prepNavCollapse();
+        if (expanding) prepNavExpand();
+
+        index = nextIndex;
+        updateChrome();
+
+        window.setTimeout(() => {
+          // Instantly drop underlay (no fade → no blink)
+          from.style.clipPath = "";
+          resetScreenClasses(from);
+
+          if (kind === "panel") {
+            to.classList.add("is-settled");
+            requestAnimationFrame(() => {
+              to.classList.remove("enter-panel");
+              to.classList.add("is-active");
+            });
+          } else {
+            to.classList.remove("enter-fade", "dur-md");
+            to.classList.add("is-active");
+          }
+
+          finishNav(!!toStep.hideNav);
+
+          transitioning = false;
+          // Finish speaking before any auto-advance so clips are never cut off
+          speakAsync(toStep.voice).then(() => {
+            if (index !== nextIndex) return; // user navigated away
+            scheduleAuto(toStep);
+          });
+        }, animDur + 20);
+      }
+
+      hintToggle.addEventListener("click", () => {
+        shell.classList.toggle("show-hints");
+        hintToggle.textContent = shell.classList.contains("show-hints") ? "Hide clicks" : "Show clicks";
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight" || e.key === " ") {
+          const step = steps[index];
+          if (step.hotspots.length) {
+            e.preventDefault();
+            goTo(step.hotspots[0].next);
+          } else if (step.autoNext != null) {
+            e.preventDefault();
+            goTo(step.autoNext);
+          }
+        } else if (e.key === "ArrowLeft" && index > 0 && !transitioning) {
+          e.preventDefault();
+          clearAuto();
+          if (window.speechSynthesis) window.speechSynthesis.cancel();
+          const from = screenEls[index];
+          const to = screenEls[index - 1];
+          resetScreenClasses(from);
+          resetScreenClasses(to);
+          to.classList.add("is-active");
+          to.setAttribute("aria-hidden", "false");
+          from.setAttribute("aria-hidden", "true");
+          index -= 1;
+          finishNav(!!steps[index].hideNav);
+          if (index < 1) voiceEnabled = false;
+          updateChrome();
+        } else if (e.key === "Escape" && window.speechSynthesis) {
+          window.speechSynthesis.cancel();
+        }
+      });
+
+      updateChrome();
+    })();
+  </script>
+</body>
+</html>

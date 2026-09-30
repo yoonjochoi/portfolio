@@ -777,12 +777,102 @@ h1.section-heading{
 	padding: 60px 0 40px;
 	background: #fff;
 	text-align: center;
+	min-height: 322px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
 }
 
 .ea-hero img{
 	width: 440px;
 	max-width: 90%;
 	height: auto;
+}
+
+.ea-hero-placeholder{
+	width: 354px;
+	height: 230px;
+	max-width: 90%;
+	margin: 0 auto;
+	border-radius: 20px;
+	background: #f2f2f7;
+}
+
+.ea-hero-icon{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 160px;
+	height: 160px;
+	margin: 0 auto;
+	overflow: hidden;
+	border-radius: 64px;
+}
+
+.ea-hero-icon img{
+	display: block;
+	width: 90%;
+	height: 90%;
+	max-width: none;
+}
+
+.ea-mvp-link{
+	display: block;
+	position: relative;
+	margin-top: 24px;
+	text-decoration: none;
+	color: inherit;
+}
+
+.ea-mvp-link .ea-figure{
+	margin-top: 0;
+	border-radius: 20px;
+}
+
+.ea-mvp-cta{
+	display: inline-block;
+	margin-top: 12px;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 21px;
+	color: #357285;
+	text-decoration: underline;
+}
+
+.ea-mvp-link:hover .ea-mvp-cta,
+.ea-mvp-link:focus .ea-mvp-cta{
+	color: #1e3c46;
+}
+
+.ea-mvp-video{
+	display: block;
+	width: 100%;
+	height: auto;
+	background: #f2f2f7;
+	border-radius: 20px;
+}
+
+.ea-lede{
+	font-weight: 500;
+}
+
+.ea-case p.ea-caption{
+	margin: 16px 0 0;
+	font-size: 14px;
+	font-style: italic;
+	color: #888;
+	text-align: center;
+}
+
+.ea-mvp-video + .ea-caption{
+	margin-top: 16px;
+}
+
+.ea-copy ul ul{
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
 .ea-case{
@@ -857,9 +947,18 @@ h1.section-heading{
 	margin-bottom: 0;
 }
 
-.ea-kicker{
+.ea-case p.ea-kicker{
 	margin: 0 0 8px;
 	font-weight: 700;
+}
+
+.ea-case p.ea-subhead{
+	margin: 0 0 8px;
+	font-weight: 600;
+}
+
+.ea-case p.ea-subhead-spaced{
+	margin-top: 24px;
 }
 
 .ea-copy ul,
@@ -873,10 +972,17 @@ h1.section-heading{
 	width: 100%;
 	height: auto;
 	margin: 24px 0 0;
+	border-radius: 20px;
+}
+
+.ea-figure-framed{
+	border: 1px solid #ddd;
+	box-sizing: border-box;
 }
 
 .ea-figure + p,
-.ea-figure + .ea-kicker{
+.ea-figure + .ea-kicker,
+.ea-case .ea-figure + p.ea-subhead{
 	margin-top: 24px;
 }
 
